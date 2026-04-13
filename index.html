@@ -2,163 +2,604 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тренажер английских слов</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>🍃 LingoPack – тест как в Duolingo</title>
+    <!-- Font Awesome для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Nunito', 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: linear-gradient(145deg, #58cc02 0%, #7cd636 100%);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            padding: 16px;
             margin: 0;
-            background-color: #f0f2f5;
         }
-        .container {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            text-align: center;
-            width: 90%;
-            max-width: 400px;
-        }
-        h1 { color: #333; font-size: 1.5rem; }
-        .word-display {
-            font-size: 2rem;
-            font-weight: bold;
-            margin: 20px 0;
-            color: #007bff;
-        }
-        input {
+
+        .duo-card {
+            max-width: 600px;
             width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            box-sizing: border-box;
-            outline: none;
+            background: #ffffff;
+            border-radius: 32px;
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.15), 0 6px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 24px 24px 32px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(2px);
+            transition: all 0.2s ease;
         }
-        input:focus { border-color: #007bff; }
-        button {
-            background-color: #28a745;
-            color: white;
+
+        /* шапка с прогрессом и счётом */
+        .duo-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+        }
+
+        .progress-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 2;
+        }
+
+        .progress-bar-bg {
+            background: #e5e5e5;
+            height: 16px;
+            border-radius: 40px;
+            flex: 1;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 16px;
+            background: #58cc02;
+            border-radius: 40px;
+            box-shadow: 0 2px 6px rgba(88, 204, 2, 0.4);
+            transition: width 0.3s cubic-bezier(0.2, 0.9, 0.4, 1);
+        }
+
+        .score-badge {
+            background: #1b2e4e;
+            color: #ffd966;
+            font-weight: 800;
+            font-size: 1.3rem;
+            padding: 6px 16px;
+            border-radius: 60px;
+            box-shadow: 0 4px 0 #0f1a2b;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .score-badge i {
+            font-size: 1.1rem;
+            color: #ffb82e;
+        }
+
+        /* маскот / иконка Duo */
+        .mascot {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .owl-icon {
+            font-size: 2.8rem;
+            color: #1b2e4e;
+            filter: drop-shadow(0 6px 0 #b0d235);
+        }
+
+        /* основной блок задания */
+        .question-box {
+            background: #f9faff;
+            border-radius: 28px;
+            padding: 28px 18px 22px;
+            margin: 10px 0 20px;
+            border: 2px dashed #c1e1a7;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.02), 0 8px 0 #c0d6b3;
+        }
+
+        .hint-emoji {
+            font-size: 5.5rem;
+            line-height: 1.2;
+            text-align: center;
+            margin-bottom: 6px;
+            filter: drop-shadow(0 6px 4px rgba(0,0,0,0.1));
+        }
+
+        .hint-label {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #3c5a2e;
+            text-transform: lowercase;
+            letter-spacing: -0.5px;
+            margin-bottom: 16px;
+        }
+
+        .hint-label small {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #6b8c5c;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .text-input-wrapper {
+            display: flex;
+            background: white;
+            border-radius: 60px;
+            border: 2.5px solid #d0e2bc;
+            transition: border 0.2s;
+            padding: 4px 4px 4px 20px;
+            align-items: center;
+            box-shadow: 0 4px 0 #b1c79b;
+        }
+
+        .text-input-wrapper:focus-within {
+            border-color: #58cc02;
+            box-shadow: 0 4px 0 #3f8e00;
+        }
+
+        .text-input-wrapper input {
+            flex: 1;
             border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            cursor: pointer;
+            padding: 16px 6px 16px 0;
+            font-size: 1.25rem;
+            font-weight: 500;
+            background: transparent;
+            outline: none;
+            color: #1e3a2f;
+            font-family: inherit;
+        }
+
+        .text-input-wrapper input::placeholder {
+            color: #a0b894;
+            font-weight: 400;
             font-size: 1rem;
-            transition: background 0.3s;
         }
-        button:hover { background-color: #218838; }
-        .message {
-            margin-top: 20px;
-            font-weight: bold;
-            min-height: 24px;
+
+        .voice-btn {
+            background: #1b2e4e;
+            border: none;
+            color: white;
+            width: 56px;
+            height: 56px;
+            border-radius: 60px;
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #0f1a2b;
+            transition: all 0.05s ease-in;
+            margin: 2px;
         }
-        .correct { color: #28a745; }
-        .incorrect { color: #dc3545; }
-        .score {
-            margin-top: 15px;
+
+        .voice-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #0f1a2b;
+        }
+
+        .voice-btn.listening {
+            background: #e33e3e;
+            box-shadow: 0 5px 0 #9e2b2b;
+            animation: pulse 1.2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 60px;
+            padding: 16px 24px;
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: 0.5px;
+            background: white;
+            box-shadow: 0 5px 0 #c2c9b2;
+            cursor: pointer;
+            transition: all 0.08s;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #1e3a2f;
+            border: 2px solid #d4e0c8;
+        }
+
+        .btn-primary {
+            background: #58cc02;
+            color: white;
+            box-shadow: 0 5px 0 #3f8e00;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: #e1eede;
+            box-shadow: 0 5px 0 #b1c2a3;
+        }
+
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #3f8e00;
+        }
+
+        .btn-primary:active {
+            box-shadow: 0 2px 0 #2b6600;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            transform: none;
+            box-shadow: 0 5px 0 #aaa;
+            pointer-events: none;
+        }
+
+        .feedback {
+            min-height: 40px;
+            margin: 16px 0 8px;
+            font-weight: 600;
+            text-align: center;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .correct-feedback {
+            color: #1e7b1e;
+        }
+
+        .wrong-feedback {
+            color: #c95b0c;
+        }
+
+        .next-area {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .continue-btn {
+            background: #1b2e4e;
+            color: white;
+            box-shadow: 0 5px 0 #0f1a2b;
+            border: none;
+            padding: 14px 32px;
+            font-size: 1.2rem;
+            border-radius: 40px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.08s;
+        }
+
+        .continue-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #0f1a2b;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .word-count {
             font-size: 0.9rem;
-            color: #666;
+            color: #5f7353;
+            margin-left: 5px;
+        }
+
+        i {
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
+<div class="duo-card">
+    <!-- Верхняя панель: прогресс и очки -->
+    <div class="duo-header">
+        <div class="progress-area">
+            <i class="fas fa-flag-checkered" style="color:#3c5a2e; font-size: 1.4rem;"></i>
+            <div class="progress-bar-bg">
+                <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+            </div>
+        </div>
+        <div class="score-badge">
+            <i class="fas fa-gem"></i> 
+            <span id="scoreDisplay">0</span>
+        </div>
+    </div>
 
-<div class="container">
-    <h1>Как это по-английски?</h1>
-    <div id="wordDisplay" class="word-display">Загрузка...</div>
-    <input type="text" id="userInput" placeholder="Введите перевод..." autocomplete="off">
-    <br>
-    <button onclick="checkWord()">Проверить</button>
-    <div id="message" class="message"></div>
-    <div class="score">Правильно: <span id="scoreCount">0</span> из <span id="totalCount">0</span></div>
+    <!-- Маскот -->
+    <div class="mascot">
+        <div class="owl-icon">🦉</div>
+    </div>
+
+    <!-- Карточка задания -->
+    <div class="question-box">
+        <div class="hint-emoji" id="emojiHint">☕</div>
+        <div class="hint-label" id="textHint">
+            coffee
+            <small>напиши фразу полностью</small>
+        </div>
+
+        <div class="input-group">
+            <div class="text-input-wrapper">
+                <input type="text" id="answerInput" placeholder="например, a cup of coffee" autocomplete="off" autofocus>
+                <button class="voice-btn" id="voiceBtn" title="Голосовой ввод"><i class="fas fa-microphone"></i></button>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="checkBtn"><i class="fas fa-check-circle"></i> Проверить</button>
+                <button class="btn btn-secondary" id="hintBtn" title="Показать правильный ответ"><i class="fas fa-lightbulb"></i> Подсказка</button>
+            </div>
+        </div>
+
+        <!-- Сообщение обратной связи -->
+        <div class="feedback" id="feedbackMsg">
+            <!-- динамически заполняется -->
+        </div>
+    </div>
+
+    <!-- Кнопка продолжить (появляется после правильного ответа) -->
+    <div class="next-area">
+        <button class="continue-btn hidden" id="continueBtn"><span>ДАЛЬШЕ</span> <i class="fas fa-arrow-right"></i></button>
+    </div>
+    
+    <!-- Счётчик слов -->
+    <div style="display: flex; justify-content: space-between; margin-top: 12px; color: #3a562a; padding:0 6px;">
+        <span><i class="far fa-list-alt"></i> <span id="currentIndexDisplay">1</span>/<span id="totalCount">16</span></span>
+        <span class="word-count"><i class="far fa-comment-dots"></i> голосовой ввод активен</span>
+    </div>
 </div>
 
 <script>
-    const dictionary = [
-        { ru: "торт", en: "cake" },
-        { ru: "оливковое масло", en: "olive oil" },
-        { ru: "мороженое", en: "ice cream" },
-        { ru: "масло", en: "butter" },
-        { ru: "шоколад", en: "chocolate" },
-        { ru: "сахар", en: "sugar" },
-        { ru: "джем", en: "jam" },
-        { ru: "сыр", en: "cheese" },
-        { ru: "молоко", en: "milk" },
-        { ru: "мясо", en: "meat" },
-        { ru: "сосиски", en: "sausages" },
-        { ru: "яйца", en: "eggs" },
-        { ru: "рыба", en: "fish" },
-        { ru: "курица", en: "chicken" },
-        { ru: "капуста", en: "cabbage" },
-        { ru: "лук", en: "onions" },
-        { ru: "помидоры", en: "tomatoes" },
-        { ru: "чеснок", en: "garlic" },
-        { ru: "лимон", en: "lemons" },
-        { ru: "виноград", en: "grapes" },
-        { ru: "вишни", en: "cherries" },
-        { ru: "ананас", en: "pineapple" },
-        { ru: "клубника", en: "strawberries" },
-        { ru: "апельсиновый сок", en: "orange juice" },
-        { ru: "макароны", en: "pasta" },
-        { ru: "рис", en: "rice" },
-        { ru: "хлеб", en: "bread" },
-        { ru: "хлопья", en: "cereal" }
-    ];
+    (function(){
+        "use strict";
 
-    let currentIndex = 0;
-    let correctScore = 0;
-    let totalAttempts = 0;
+        // ---------- ДАННЫЕ ТЕСТА ----------
+        const phrases = [
+            { phrase: "a cup of coffee",   emoji: "☕",   hintWord: "coffee" },
+            { phrase: "a bag of flour",    emoji: "🛍️🌾", hintWord: "flour" },
+            { phrase: "a tube of toothpaste", emoji: "🦷🧴", hintWord: "toothpaste" },
+            { phrase: "a jar of jam",      emoji: "🫙🍓", hintWord: "jam" },
+            { phrase: "a bottle of lemonade", emoji: "🍋🧃", hintWord: "lemonade" },
+            { phrase: "a carton of milk",  emoji: "🥛📦", hintWord: "milk" },
+            { phrase: "a packet of tea",   emoji: "🍵📦", hintWord: "tea" },
+            { phrase: "a kilo of meat",    emoji: "🥩⚖️", hintWord: "meat" },
+            { phrase: "a bar of chocolate", emoji: "🍫",   hintWord: "chocolate" },
+            { phrase: "a tin of mushrooms", emoji: "🥫🍄", hintWord: "mushrooms" },
+            { phrase: "a piece of cheese", emoji: "🧀",    hintWord: "cheese" },
+            { phrase: "a loaf of bread",   emoji: "🍞",    hintWord: "bread" },
+            { phrase: "a carton of yoghurt", emoji: "🥛🍶", hintWord: "yoghurt" },
+            { phrase: "a bowl of soup",    emoji: "🥣🍲",  hintWord: "soup" },
+            { phrase: "a piece of paper",  emoji: "📄",    hintWord: "paper" },
+            { phrase: "a glass of water",  emoji: "🥛💧",  hintWord: "water" }
+        ];
 
-    // Перемешивание слов
-    dictionary.sort(() => Math.random() - 0.5);
+        // ---------- СОСТОЯНИЕ ----------
+        let currentIndex = 0;               // 0-based
+        let score = 0;
+        let isAnsweredCorrect = false;      // блокирует повторную проверку
+        let correctAnswerGiven = false;     // чтобы показать continue
+        let listening = false;
+        let recognition = null;
+        const totalItems = phrases.length;
 
-    function displayWord() {
-        if (currentIndex < dictionary.length) {
-            document.getElementById('wordDisplay').innerText = dictionary[currentIndex].ru;
-            document.getElementById('userInput').value = '';
-            document.getElementById('message').innerText = '';
-        } else {
-            document.querySelector('.container').innerHTML = `<h1>Готово!</h1><p>Ваш результат: ${correctScore} из ${dictionary.length}</p><button onclick="location.reload()">Начать заново</button>`;
+        // DOM элементы
+        const emojiHint = document.getElementById('emojiHint');
+        const textHint = document.getElementById('textHint');
+        const answerInput = document.getElementById('answerInput');
+        const checkBtn = document.getElementById('checkBtn');
+        const hintBtn = document.getElementById('hintBtn');
+        const voiceBtn = document.getElementById('voiceBtn');
+        const feedbackMsg = document.getElementById('feedbackMsg');
+        const continueBtn = document.getElementById('continueBtn');
+        const progressFill = document.getElementById('progressFill');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const currentIndexDisplay = document.getElementById('currentIndexDisplay');
+        const totalCountSpan = document.getElementById('totalCount');
+
+        totalCountSpan.textContent = totalItems;
+
+        // ---------- ИНИЦИАЛИЗАЦИЯ РЕЧИ ----------
+        function initSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                voiceBtn.disabled = true;
+                voiceBtn.title = 'Браузер не поддерживает голосовой ввод';
+                feedbackMsg.innerHTML = '<span style="color:#a94442;">⚠️ Голосовой ввод не поддерживается</span>';
+                return null;
+            }
+            const recog = new SpeechRecognition();
+            recog.continuous = false;
+            recog.interimResults = false;
+            recog.lang = 'en-US';  // английский, фразы на английском
+            return recog;
         }
-    }
 
-    function checkWord() {
-        const input = document.getElementById('userInput').value.trim().toLowerCase();
-        const correctAnswer = dictionary[currentIndex].en.toLowerCase();
-        const messageElement = document.getElementById('message');
+        recognition = initSpeechRecognition();
 
-        totalAttempts++;
-        
-        if (input === correctAnswer) {
-            messageElement.innerText = "Правильно! 🎉";
-            messageElement.className = "message correct";
-            correctScore++;
+        // ---------- ОБНОВЛЕНИЕ ИНТЕРФЕЙСА ПОД ТЕКУЩИЙ ЭЛЕМЕНТ ----------
+        function loadItem(index) {
+            const item = phrases[index];
+            emojiHint.textContent = item.emoji;
+            // Показываем слово-подсказку
+            textHint.innerHTML = `${item.hintWord} <small>напиши фразу полностью</small>`;
+            answerInput.value = '';
+            feedbackMsg.innerHTML = '';
+            isAnsweredCorrect = false;
+            correctAnswerGiven = false;
+            continueBtn.classList.add('hidden');
+            answerInput.disabled = false;
+            checkBtn.disabled = false;
+            voiceBtn.disabled = false; 
+            answerInput.focus();
+
+            // Обновляем счётчик
+            currentIndexDisplay.textContent = index + 1;
+            // Прогресс бар
+            const progressPercent = ((index) / totalItems) * 100;
+            progressFill.style.width = progressPercent + '%';
+            
+            // Если вдруг это последний и уже всё пройдено — но мы обрабатываем завершение отдельно
+        }
+
+        // Обновить очки
+        function updateScoreUI() {
+            scoreDisplay.textContent = score;
+        }
+
+        // Показать сообщение об ошибке/успехе
+        function setFeedback(text, isCorrect) {
+            feedbackMsg.innerHTML = text;
+            feedbackMsg.className = 'feedback ' + (isCorrect ? 'correct-feedback' : 'wrong-feedback');
+        }
+
+        // Сравнение ответа (приводим к нижнему регистру, убираем лишние пробелы)
+        function normalizeAnswer(str) {
+            return str.trim().toLowerCase().replace(/\s+/g, ' ');
+        }
+
+        // Проверка ответа
+        function checkAnswer() {
+            if (isAnsweredCorrect) {
+                setFeedback('✅ Уже правильно! Нажми "Дальше"', true);
+                return;
+            }
+
+            const userAnswer = answerInput.value;
+            if (!userAnswer.trim()) {
+                setFeedback('✏️ Введи или произнеси ответ', false);
+                return;
+            }
+
+            const currentPhrase = phrases[currentIndex].phrase;
+            const normalizedUser = normalizeAnswer(userAnswer);
+            const normalizedCorrect = normalizeAnswer(currentPhrase);
+
+            if (normalizedUser === normalizedCorrect) {
+                // Правильно!
+                isAnsweredCorrect = true;
+                correctAnswerGiven = true;
+                score++;
+                updateScoreUI();
+                setFeedback(`🎉 Отлично! «${currentPhrase}»`, true);
+                
+                // Блокируем ввод и кнопки проверки
+                answerInput.disabled = true;
+                checkBtn.disabled = true;
+                voiceBtn.disabled = true;
+                
+                // Показываем кнопку продолжить
+                continueBtn.classList.remove('hidden');
+                
+                // Если это последний элемент – можно сменить надпись
+                if (currentIndex === totalItems - 1) {
+                    continueBtn.innerHTML = '<span>ЗАВЕРШИТЬ</span> <i class="fas fa-trophy"></i>';
+                } else {
+                    continueBtn.innerHTML = '<span>ДАЛЬШЕ</span> <i class="fas fa-arrow-right"></i>';
+                }
+            } else {
+                setFeedback(`❌ Не совсем. Попробуй ещё раз.`, false);
+                // вибрация (опционально)
+                answerInput.classList.add('error-shake');
+                setTimeout(() => answerInput.classList.remove('error-shake'), 300);
+            }
+        }
+
+        // Переход к следующему вопросу или завершение
+        function goToNext() {
+            if (!correctAnswerGiven && currentIndex < totalItems - 1) {
+                // если по какой-то причине не отвечено, но нажали (кнопка скрыта, но вдруг)
+                return;
+            }
+
+            if (currentIndex === totalItems - 1) {
+                // Тест завершён
+                finishQuiz();
+                return;
+            }
+
             currentIndex++;
-            setTimeout(displayWord, 1000); // Переход к следующему слову через секунду
-        } else {
-            messageElement.innerText = ` Ошибка. Правильно: ${correctAnswer}`;
-            messageElement.className = "message incorrect";
-            // Если нужно, чтобы слово повторялось до победного, не увеличиваем currentIndex
+            loadItem(currentIndex);
         }
 
-        document.getElementById('scoreCount').innerText = correctScore;
-        document.getElementById('totalCount').innerText = totalAttempts;
-    }
-
-    // Позволяет нажимать Enter для проверки
-    document.getElementById('userInput').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            checkWord();
+        function finishQuiz() {
+            // Показываем поздравление
+            emojiHint.textContent = '🏆';
+            textHint.innerHTML = `Молодец! ${score} из ${totalItems}`;
+            answerInput.disabled = true;
+            checkBtn.disabled = true;
+            voiceBtn.disabled = true;
+            continueBtn.classList.add('hidden');
+            feedbackMsg.innerHTML = `<span style="color:#1e7b1e; font-size:1.5rem;">🎓 Тест пройден!</span>`;
+            progressFill.style.width = '100%';
+            // Можно добавить конфетти? Не будем усложнять.
         }
-    });
 
-    displayWord();
-</script>
+        // Показать подсказку (правильный ответ)
+        function showHint() {
+            const correct = phrases[currentIndex].phrase;
+            setFeedback(`💡 Правильно: "${correct}"`, false);
+            // Не засчитываем как ответ
+        }
 
-</body>
-</html>
+        // Голосовой ввод
+        function startVoiceInput() {
+            if (!recognition) {
+                setFeedback('🎤 Голосовой ввод недоступен в этом браузере', false);
+                return;
+            }
+            if (listening) {
+                recognition.stop();
+                return;
+            }
+
+            recognition.start();
+            listening = true;
+            voiceBtn.classList.add('listening');
+            voiceBtn.innerHTML = '<i class="fas fa-microphone-alt"></i>';
+            setFeedback('🎤 Говорите...', false);
+            
+            // Таймаут безопасности
+            setTimeout(() => {
+                if (listening) {
+                    recognition.stop();
+                }
+            }, 7000);
+    
