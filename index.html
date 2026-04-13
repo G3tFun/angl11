@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер английских слов</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+        h1 { color: #333; font-size: 1.5rem; }
+        .word-display {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #007bff;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+        }
+        input:focus { border-color: #007bff; }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+        button:hover { background-color: #218838; }
+        .message {
+            margin-top: 20px;
+            font-weight: bold;
+            min-height: 24px;
+        }
+        .correct { color: #28a745; }
+        .incorrect { color: #dc3545; }
+        .score {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Как это по-английски?</h1>
+    <div id="wordDisplay" class="word-display">Загрузка...</div>
+    <input type="text" id="userInput" placeholder="Введите перевод..." autocomplete="off">
+    <br>
+    <button onclick="checkWord()">Проверить</button>
+    <div id="message" class="message"></div>
+    <div class="score">Правильно: <span id="scoreCount">0</span> из <span id="totalCount">0</span></div>
+</div>
+
+<script>
+    const dictionary = [
+        { ru: "торт", en: "cake" },
+        { ru: "оливковое масло", en: "olive oil" },
+        { ru: "мороженое", en: "ice cream" },
+        { ru: "масло", en: "butter" },
+        { ru: "шоколад", en: "chocolate" },
+        { ru: "сахар", en: "sugar" },
+        { ru: "джем", en: "jam" },
+        { ru: "сыр", en: "cheese" },
+        { ru: "молоко", en: "milk" },
+        { ru: "мясо", en: "meat" },
+        { ru: "сосиски", en: "sausages" },
+        { ru: "яйца", en: "eggs" },
+        { ru: "рыба", en: "fish" },
+        { ru: "курица", en: "chicken" },
+        { ru: "капуста", en: "cabbage" },
+        { ru: "лук", en: "onions" },
+        { ru: "помидоры", en: "tomatoes" },
+        { ru: "чеснок", en: "garlic" },
+        { ru: "лимон", en: "lemons" },
+        { ru: "виноград", en: "grapes" },
+        { ru: "вишни", en: "cherries" },
+        { ru: "ананас", en: "pineapple" },
+        { ru: "клубника", en: "strawberries" },
+        { ru: "апельсиновый сок", en: "orange juice" },
+        { ru: "макароны", en: "pasta" },
+        { ru: "рис", en: "rice" },
+        { ru: "хлеб", en: "bread" },
+        { ru: "хлопья", en: "cereal" }
+    ];
+
+    let currentIndex = 0;
+    let correctScore = 0;
+    let totalAttempts = 0;
+
+    // Перемешивание слов
+    dictionary.sort(() => Math.random() - 0.5);
+
+    function displayWord() {
+        if (currentIndex < dictionary.length) {
+            document.getElementById('wordDisplay').innerText = dictionary[currentIndex].ru;
+            document.getElementById('userInput').value = '';
+            document.getElementById('message').innerText = '';
+        } else {
+            document.querySelector('.container').innerHTML = `<h1>Готово!</h1><p>Ваш результат: ${correctScore} из ${dictionary.length}</p><button onclick="location.reload()">Начать заново</button>`;
+        }
+    }
+
+    function checkWord() {
+        const input = document.getElementById('userInput').value.trim().toLowerCase();
+        const correctAnswer = dictionary[currentIndex].en.toLowerCase();
+        const messageElement = document.getElementById('message');
+
+        totalAttempts++;
+        
+        if (input === correctAnswer) {
+            messageElement.innerText = "Правильно! 🎉";
+            messageElement.className = "message correct";
+            correctScore++;
+            currentIndex++;
+            setTimeout(displayWord, 1000); // Переход к следующему слову через секунду
+        } else {
+            messageElement.innerText = ` Ошибка. Правильно: ${correctAnswer}`;
+            messageElement.className = "message incorrect";
+            // Если нужно, чтобы слово повторялось до победного, не увеличиваем currentIndex
+        }
+
+        document.getElementById('scoreCount').innerText = correctScore;
+        document.getElementById('totalCount').innerText = totalAttempts;
+    }
+
+    // Позволяет нажимать Enter для проверки
+    document.getElementById('userInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            checkWord();
+        }
+    });
+
+    displayWord();
+</script>
+
+</body>
+</html>
