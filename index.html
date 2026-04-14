@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>✨ DuoQuiz · Еда и продукты</title>
+  <title>🦉 DuoFood · перевод на английский</title>
   <style>
     * {
       box-sizing: border-box;
@@ -23,7 +23,6 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* главная карточка — как экран телефона */
     .phone-frame {
       max-width: 420px;
       width: 100%;
@@ -36,7 +35,6 @@
       transition: all 0.2s;
     }
 
-    /* шапка в стиле Duolingo */
     .duo-header {
       display: flex;
       align-items: center;
@@ -74,12 +72,6 @@
       border: 1px solid #ffe6c6;
     }
 
-    .heart-score span {
-      font-size: 20px;
-      margin-right: 4px;
-    }
-
-    /* прогресс-бар */
     .progress-section {
       margin-bottom: 22px;
     }
@@ -109,7 +101,6 @@
       box-shadow: inset 0 1px 2px rgba(255,255,255,0.5);
     }
 
-    /* карточка вопроса */
     .question-card {
       background: #ffffff;
       border-radius: 28px;
@@ -119,7 +110,7 @@
       border: 1px solid #d4ebc5;
     }
 
-    .english-phrase {
+    .russian-phrase {
       font-size: 32px;
       font-weight: 700;
       text-align: center;
@@ -130,7 +121,6 @@
       text-shadow: 1px 1px 0 rgba(255,255,255,0.8);
     }
 
-    /* зона ввода (input) */
     .input-area {
       display: flex;
       flex-direction: column;
@@ -162,7 +152,6 @@
       opacity: 0.8;
     }
 
-    /* сетка для вариантов (выбор) */
     .options-grid {
       display: flex;
       flex-direction: column;
@@ -215,7 +204,6 @@
       pointer-events: none;
     }
 
-    /* кнопка проверки */
     .check-btn {
       background: #58cc02;
       border: none;
@@ -255,12 +243,6 @@
       margin-top: 20px;
     }
 
-    .continue-btn:active {
-      transform: translateY(4px);
-      box-shadow: 0 2px 0 #0f1e08;
-    }
-
-    /* блок обратной связи */
     .feedback-message {
       min-height: 48px;
       margin: 12px 0 6px;
@@ -281,7 +263,6 @@
       color: #a1300e;
     }
 
-    /* нижняя панель */
     .bottom-actions {
       display: flex;
       align-items: center;
@@ -301,11 +282,6 @@
       align-items: center;
       gap: 6px;
       cursor: pointer;
-      transition: background 0.1s;
-    }
-
-    .restart-btn:active {
-      background: #e2f0d8;
     }
 
     .small-note {
@@ -314,7 +290,6 @@
       font-weight: 500;
     }
 
-    /* завершающий экран */
     .complete-screen {
       text-align: center;
       padding: 30px 10px;
@@ -331,19 +306,13 @@
       color: #2b7334;
     }
 
-    /* утилиты */
     .hidden {
       display: none !important;
-    }
-
-    .no-select {
-      user-select: none;
     }
   </style>
 </head>
 <body>
 <div class="phone-frame">
-  <!-- Верхняя панель -->
   <div class="duo-header">
     <div class="duo-icon">
       <span>🦉</span>
@@ -354,7 +323,6 @@
     </div>
   </div>
 
-  <!-- Прогресс -->
   <div class="progress-section">
     <div class="progress-info">
       <span id="progressText">Вопрос 1/17</span>
@@ -365,26 +333,20 @@
     </div>
   </div>
 
-  <!-- Основной контейнер вопроса -->
   <div id="quizArea">
     <div class="question-card">
-      <div class="english-phrase" id="englishPhrase">a cup of coffee</div>
+      <div class="russian-phrase" id="russianPhrase">чашка кофе</div>
       
-      <!-- Динамический контент: input или выбор -->
       <div id="dynamicContent"></div>
       
-      <!-- Кнопка "Проверить" (только для ввода) -->
       <button class="check-btn" id="checkBtn">Проверить</button>
       
-      <!-- Сообщение об ошибке/правильности -->
-      <div class="feedback-message" id="feedbackMsg">Введи перевод ✏️</div>
+      <div class="feedback-message" id="feedbackMsg">Введи перевод на английский ✏️</div>
       
-      <!-- Кнопка "Продолжить" (появляется после ответа) -->
       <button class="check-btn continue-btn hidden" id="continueBtn">ПРОДОЛЖИТЬ</button>
     </div>
   </div>
 
-  <!-- Экран завершения -->
   <div id="completionScreen" class="complete-screen hidden">
     <div class="complete-emoji">🏆</div>
     <div class="complete-title">Урок пройден!</div>
@@ -392,7 +354,6 @@
     <button class="check-btn" id="restartFromCompleteBtn" style="box-shadow: 0 5px 0 #3f9e00;">НАЧАТЬ ЗАНОВО</button>
   </div>
 
-  <!-- Нижняя панель -->
   <div class="bottom-actions">
     <button class="restart-btn" id="restartBtn">
       <span>⟳</span> Заново
@@ -405,42 +366,38 @@
   (function(){
     "use strict";
 
-    // ---------- СЛОВАРЬ (англ ➔ русский) ----------
+    // ---------- СЛОВАРЬ: русский ➔ английский ----------
     const PHRASES = [
-      { en: "a cup of coffee", ru: "чашка кофе", type: "input" },
-      { en: "a bag of flour", ru: "пакет муки", type: "input" },
-      { en: "a tube of toothpaste", ru: "тюбик зубной пасты", type: "input" },
-      { en: "a jar of jam", ru: "банка варенья", type: "input" },
-      { en: "a bottle of lemonade", ru: "бутылка лимонада", type: "input" },
-      { en: "a carton of milk", ru: "пакет молока", type: "input" },
-      { en: "a packet of tea", ru: "пачка чая", type: "input" },
-      { en: "a kilo of meat", ru: "килограмм мяса", type: "input" },
-      // следующие — с выбором ответа (choice)
-      { en: "a bar of chocolate", ru: "плитка шоколада", type: "choice" },
-      { en: "a tin of mushrooms", ru: "банка грибов", type: "choice" },
-      { en: "a piece of cheese", ru: "кусок сыра", type: "choice" },
-      { en: "a loaf of bread", ru: "буханка хлеба", type: "choice" },
-      { en: "a carton of yoghurt", ru: "упаковка йогурта", type: "choice" },
-      { en: "a bowl of soup", ru: "тарелка супа", type: "choice" },
-      { en: "a piece of paper", ru: "лист бумаги", type: "choice" },
-      { en: "a glass of water", ru: "стакан воды", type: "choice" },
-      { en: "a cup of coffee", ru: "чашка кофе", type: "choice" } // ещё одна чашка для разнообразия, но перевод тот же
+      { ru: "чашка кофе", en: "a cup of coffee", type: "input" },
+      { ru: "пакет муки", en: "a bag of flour", type: "input" },
+      { ru: "тюбик зубной пасты", en: "a tube of toothpaste", type: "input" },
+      { ru: "банка варенья", en: "a jar of jam", type: "input" },
+      { ru: "бутылка лимонада", en: "a bottle of lemonade", type: "input" },
+      { ru: "пакет молока", en: "a carton of milk", type: "input" },
+      { ru: "пачка чая", en: "a packet of tea", type: "input" },
+      { ru: "килограмм мяса", en: "a kilo of meat", type: "input" },
+      // выбор ответа (choice)
+      { ru: "плитка шоколада", en: "a bar of chocolate", type: "choice" },
+      { ru: "банка грибов", en: "a tin of mushrooms", type: "choice" },
+      { ru: "кусок сыра", en: "a piece of cheese", type: "choice" },
+      { ru: "буханка хлеба", en: "a loaf of bread", type: "choice" },
+      { ru: "упаковка йогурта", en: "a carton of yoghurt", type: "choice" },
+      { ru: "тарелка супа", en: "a bowl of soup", type: "choice" },
+      { ru: "лист бумаги", en: "a piece of paper", type: "choice" },
+      { ru: "стакан воды", en: "a glass of water", type: "choice" },
+      { ru: "чашка кофе", en: "a cup of coffee", type: "choice" }
     ];
-
-    // Немного подправим последний элемент (чтобы не скучно), но оставим как есть.
-    // Всего 17 фраз (индексы 0..16)
 
     const TOTAL = PHRASES.length;
 
-    // Состояние
     let currentIndex = 0;
     let score = 0;
-    let answered = false;        // был ли дан ответ на текущий вопрос
+    let answered = false;
     let isCorrect = false;
-    let currentOptions = [];      // для choice вопросов
+    let currentOptions = [];
 
     // DOM элементы
-    const englishPhraseEl = document.getElementById('englishPhrase');
+    const russianPhraseEl = document.getElementById('russianPhrase');
     const dynamicContent = document.getElementById('dynamicContent');
     const checkBtn = document.getElementById('checkBtn');
     const continueBtn = document.getElementById('continueBtn');
@@ -458,32 +415,26 @@
 
     totalQuestionsSpan.textContent = TOTAL;
 
-    // Вспомогательные функции
     function normalizeAnswer(str) {
       return str.trim().toLowerCase().replace(/\s+/g, ' ');
     }
 
-    // Генерация вариантов для choice (правильный + 3 случайных из других фраз)
-    function generateOptions(correctRu, excludeIndex) {
+    // Генерация вариантов (английские)
+    function generateOptions(correctEn, excludeIndex) {
       const otherTranslations = PHRASES
         .filter((_, idx) => idx !== excludeIndex)
-        .map(p => p.ru);
+        .map(p => p.en);
       
-      // Убираем дубликаты в пуле
       const uniqueOthers = [...new Set(otherTranslations)];
-      
-      // перемешиваем и берём 3 уникальных
-      let pool = uniqueOthers.filter(ru => ru !== correctRu);
-      // если вдруг мало (но у нас много)
+      let pool = uniqueOthers.filter(en => en !== correctEn);
       while (pool.length < 3) {
-        pool.push('пакет чая'); // fallback
+        pool.push('a cup of coffee');
       }
       
       const shuffled = [...pool].sort(() => Math.random() - 0.5);
       const selected = shuffled.slice(0, 3);
       
-      let options = [correctRu, ...selected];
-      // перемешать варианты
+      let options = [correctEn, ...selected];
       for (let i = options.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [options[i], options[j]] = [options[j], options[i]];
@@ -491,43 +442,31 @@
       return options;
     }
 
-    // Отображение текущего вопроса
     function renderQuestion() {
       const phrase = PHRASES[currentIndex];
-      englishPhraseEl.textContent = phrase.en;
+      russianPhraseEl.textContent = phrase.ru;
       
-      // Обновляем подсказку типа задания
-      if (phrase.type === 'input') {
-        typeHint.textContent = '✏️ Введи перевод';
-      } else {
-        typeHint.textContent = '👆 Выбери вариант';
-      }
+      typeHint.textContent = phrase.type === 'input' ? '✏️ Введи английский' : '👆 Выбери английский вариант';
       
-      // Сброс состояния ответа
       answered = false;
       isCorrect = false;
       
-      // Прячем кнопку продолжить, показываем проверить (для input) / для choice скроем чек-кнопку
       continueBtn.classList.add('hidden');
       checkBtn.classList.remove('hidden');
       
-      // Очищаем feedback (нейтральный)
-      feedbackMsg.textContent = phrase.type === 'input' ? 'Введи перевод ✏️' : 'Выбери правильный перевод 👇';
+      feedbackMsg.textContent = phrase.type === 'input' ? 'Введи перевод на английский ✏️' : 'Выбери правильный перевод 👇';
       feedbackMsg.classList.remove('error-feedback');
       
-      // Строим интерфейс в зависимости от типа
       if (phrase.type === 'input') {
-        // поле ввода
         dynamicContent.innerHTML = `
           <div class="input-area">
-            <input type="text" id="translationInput" class="translation-input" placeholder="введи по-русски..." autocomplete="off" autofocus>
+            <input type="text" id="translationInput" class="translation-input" placeholder="введи по-английски..." autocomplete="off" autofocus>
           </div>
         `;
         const inputField = document.getElementById('translationInput');
         inputField.disabled = false;
         inputField.focus();
         
-        // вешаем обработчик на Enter
         inputField.addEventListener('keypress', (e) => {
           if (e.key === 'Enter' && !answered) {
             e.preventDefault();
@@ -538,9 +477,8 @@
         checkBtn.disabled = false;
         checkBtn.onclick = handleCheck;
       } else {
-        // choice: варианты
-        const correctRu = phrase.ru;
-        currentOptions = generateOptions(correctRu, currentIndex);
+        const correctEn = phrase.en;
+        currentOptions = generateOptions(correctEn, currentIndex);
         
         let optionsHtml = `<div class="options-grid" id="optionsContainer">`;
         currentOptions.forEach(opt => {
@@ -549,7 +487,6 @@
         optionsHtml += `</div>`;
         dynamicContent.innerHTML = optionsHtml;
         
-        // кнопку "Проверить" скрываем — в choice проверка мгновенная
         checkBtn.classList.add('hidden');
         
         const optionButtons = document.querySelectorAll('.option-btn');
@@ -557,12 +494,11 @@
           btn.addEventListener('click', (e) => {
             if (answered) return;
             const selected = btn.dataset.value;
-            const isAnswerCorrect = (selected === correctRu);
+            const isAnswerCorrect = (selected === correctEn);
             
-            // Визуальная обратная связь
             optionButtons.forEach(b => {
               b.disabled = true;
-              if (b.dataset.value === correctRu) {
+              if (b.dataset.value === correctEn) {
                 b.classList.add('correct-guess');
               }
             });
@@ -571,13 +507,11 @@
               btn.classList.add('wrong-guess');
             }
             
-            // Обработка результата
-            handleChoiceResult(isAnswerCorrect, correctRu);
+            handleChoiceResult(isAnswerCorrect, correctEn);
           });
         });
       }
       
-      // Обновление прогресса
       updateProgressAndScore();
     }
 
@@ -594,18 +528,14 @@
         feedbackMsg.classList.add('error-feedback');
       }
       
-      // Деактивируем все кнопки вариантов
       document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
       
-      // Обновляем счёт
       updateProgressAndScore();
       
-      // Показываем кнопку "Продолжить"
       continueBtn.classList.remove('hidden');
       checkBtn.classList.add('hidden');
     }
 
-    // Обработчик для input (кнопка Проверить)
     function handleCheck() {
       if (answered) return;
       
@@ -614,10 +544,9 @@
       if (!inputField) return;
       
       const userAnswer = normalizeAnswer(inputField.value);
-      const correctAnswer = phrase.ru;
+      const correctAnswer = phrase.en;
       const normalizedCorrect = normalizeAnswer(correctAnswer);
       
-      // Простое сравнение (можно улучшить)
       const isAnswerCorrect = (userAnswer === normalizedCorrect);
       
       answered = true;
@@ -636,7 +565,6 @@
       
       updateProgressAndScore();
       
-      // показать continue
       continueBtn.classList.remove('hidden');
     }
 
@@ -647,13 +575,11 @@
       progressText.textContent = `Вопрос ${currentIndex + 1}/${TOTAL}`;
     }
 
-    // Переход к следующему вопросу или завершение
     function goToNextQuestion() {
       if (currentIndex < TOTAL - 1) {
         currentIndex++;
         renderQuestion();
       } else {
-        // Урок завершён
         finishQuiz();
       }
     }
@@ -662,11 +588,9 @@
       quizArea.classList.add('hidden');
       completionScreen.classList.remove('hidden');
       finalScoreSpan.textContent = score;
-      // обновим общий счёт на всякий
       scoreDisplay.textContent = score;
     }
 
-    // Сброс всего прогресса
     function restartQuiz() {
       currentIndex = 0;
       score = 0;
@@ -680,24 +604,12 @@
       feedbackMsg.classList.remove('error-feedback');
     }
 
-    // Обработчик continue
-    function handleContinue() {
-      if (!answered) return; // на всякий случай
-      goToNextQuestion();
-    }
-
-    // Привязка событий
-    continueBtn.addEventListener('click', handleContinue);
+    continueBtn.addEventListener('click', goToNextQuestion);
     
-    restartBtn.addEventListener('click', () => {
-      restartQuiz();
-    });
+    restartBtn.addEventListener('click', restartQuiz);
     
-    restartFromCompleteBtn.addEventListener('click', () => {
-      restartQuiz();
-    });
+    restartFromCompleteBtn.addEventListener('click', restartQuiz);
 
-    // Инициализация
     function init() {
       renderQuestion();
       updateProgressAndScore();
@@ -705,4 +617,9 @@
 
     init();
 
-    // Дополнительно: обработка свайпов/жестов не т
+    window.addEventListener('touchstart', ()=>{}, {passive: true});
+    
+  })();
+</script>
+</body>
+</html>
